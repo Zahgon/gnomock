@@ -5,9 +5,7 @@ package redis
 
 import (
 	"context"
-	"fmt"
 
-	redisclient "github.com/go-redis/redis/v7"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -21,15 +19,7 @@ func init() {
 // Preset creates a new Gmomock Redis preset. This preset includes a Redis
 // specific healthcheck function, default Redis image and port, and allows to
 // optionally set up initial state.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation for Redis storage.
 type P struct {
@@ -38,59 +28,17 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/library/redis:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(6379)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(healthcheck),
-	}
-
-	if p.Values != nil {
-		initf := func(_ context.Context, c *gnomock.Container) error {
-			addr := c.Address(gnomock.DefaultPort)
-			client := redisclient.NewClient(&redisclient.Options{Addr: addr})
-
-			defer func() { _ = client.Close() }()
-
-			for k, v := range p.Values {
-				err := client.Set(k, v, 0).Err()
-				if err != nil {
-					return fmt.Errorf("can't set '%s'='%v': %w", k, v, err)
-				}
-			}
-
-			return nil
-		}
-
-		opts = append(opts, gnomock.WithInit(initf))
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func healthcheck(_ context.Context, c *gnomock.Container) error {
-	addr := c.Address(gnomock.DefaultPort)
-	client := redisclient.NewClient(&redisclient.Options{Addr: addr})
-
-	defer func() { _ = client.Close() }()
-
-	_, err := client.Ping().Result()
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }

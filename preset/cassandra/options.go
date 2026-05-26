@@ -5,8 +5,4 @@ package cassandra
 type Option func(*P)
 
 // WithVersion sets image version.
-func WithVersion(version string) Option {
-	return func(o *P) {
-		o.Version = version
-	}
-}
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }

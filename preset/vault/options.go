@@ -5,30 +5,14 @@ package vault
 type Option func(*P)
 
 // WithVersion sets image version.
-func WithVersion(version string) Option {
-	return func(o *P) {
-		o.Version = version
-	}
-}
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithAuthToken sets authentication (root) token to be used to connect to this
 // container.
-func WithAuthToken(token string) Option {
-	return func(p *P) {
-		p.AuthToken = token
-	}
-}
+func WithAuthToken(token string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithAuth enables new vault authorizations endpoints.
-func WithAuth(auth []Auth) Option {
-	return func(p *P) {
-		p.Auth = auth
-	}
-}
+func WithAuth(auth []Auth) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithPolicies configures vault with the provided policies.
-func WithPolicies(policies []Policy) Option {
-	return func(p *P) {
-		p.Policies = policies
-	}
-}
+func WithPolicies(policies []Policy) Option { _ = "STUB: not implemented"; return *new(Option) }

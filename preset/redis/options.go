@@ -7,15 +7,7 @@ type Option func(*P)
 // WithValues initializes Redis with the provided key/value pairs. These values
 // never expire. See go-redis/redis package for information on supported value
 // types.
-func WithValues(vs map[string]interface{}) Option {
-	return func(p *P) {
-		p.Values = vs
-	}
-}
+func WithValues(vs map[string]interface{}) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithVersion sets image version.
-func WithVersion(version string) Option {
-	return func(o *P) {
-		o.Version = version
-	}
-}
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }

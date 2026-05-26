@@ -4,8 +4,6 @@ package mssql
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
 
 	_ "github.com/microsoft/go-mssqldb" // mssql driver
 	"github.com/orlangure/gnomock"
@@ -31,15 +29,7 @@ func init() {
 // When used without any configuration, it uses `mydb` database, and `Gn0m!ck~`
 // administrator password (user: `sa`). You must accept EULA to use this image
 // (`WithLicense` option). By default, version `2019-latest` is used.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation of Microsoft SQL Server database.
 type P struct {
@@ -52,114 +42,23 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("mcr.microsoft.com/mssql/server:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(defaultPort)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
-
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-		gnomock.WithEnv("SA_PASSWORD=" + p.Password),
-		gnomock.WithInit(p.initf()),
-	}
-
-	if p.License {
-		opts = append(opts, gnomock.WithEnv("ACCEPT_EULA=Y"))
-	}
-
-	return opts
-}
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
 func (p *P) healthcheck(_ context.Context, c *gnomock.Container) error {
-	addr := c.Address(gnomock.DefaultPort)
-
-	db, err := p.connect(addr, masterDB)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		_ = db.Close()
-	}()
-
-	var one int
-
-	return db.QueryRow(`select 1`).Scan(&one)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *P) initf() gnomock.InitFunc {
-	return func(_ context.Context, c *gnomock.Container) error {
-		addr := c.Address(gnomock.DefaultPort)
+func (p *P) initf() gnomock.InitFunc { _ = "STUB: not implemented"; return *new(gnomock.InitFunc) }
 
-		db, err := p.connect(addr, masterDB)
-		if err != nil {
-			return err
-		}
+// nolint:gosec
 
-		_, err = db.Exec("create database " + p.DB)
-		if err != nil {
-			_ = db.Close()
-			return fmt.Errorf("can't create database '%s': %w", p.DB, err)
-		}
+func (p *P) connect(addr, db string) (*sql.DB, error) { _ = "STUB: not implemented"; return nil, nil }
 
-		_ = db.Close()
-
-		db, err = p.connect(addr, p.DB)
-		if err != nil {
-			return err
-		}
-
-		defer func() { _ = db.Close() }()
-
-		if len(p.QueriesFiles) > 0 {
-			for _, f := range p.QueriesFiles {
-				bs, err := os.ReadFile(f) // nolint:gosec
-				if err != nil {
-					return fmt.Errorf("can't read queries file '%s': %w", f, err)
-				}
-
-				p.Queries = append([]string{string(bs)}, p.Queries...)
-			}
-		}
-
-		for _, q := range p.Queries {
-			_, err = db.Exec(q)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-}
-
-func (p *P) connect(addr, db string) (*sql.DB, error) {
-	connStr := fmt.Sprintf(
-		"sqlserver://sa:%s@%s?database=%s",
-		p.Password, addr, db,
-	)
-
-	return sql.Open("sqlserver", connStr)
-}
-
-func (p *P) setDefaults() {
-	if p.DB == "" {
-		p.DB = defaultDatabase
-	}
-
-	if p.Password == "" {
-		p.Password = defaultPassword
-	}
-
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }

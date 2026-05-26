@@ -7,12 +7,8 @@
 package splunk
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
-	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
@@ -38,15 +34,7 @@ func init() {
 // Preset creates a new Gnomock Splunk preset. This preset includes a Splunk
 // specific healthcheck function, default Splunk image and ports, and allows to
 // optionally ingest initial logs.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation of Splunk.
 type P struct {
@@ -58,94 +46,31 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/splunk/splunk:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.NamedPorts{
-		CollectorPort: gnomock.TCP(8088),
-		APIPort:       gnomock.TCP(8089),
-		WebPort:       gnomock.TCP(8000),
-	}
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(healthcheck(p.AdminPassword)),
-		gnomock.WithEnv("SPLUNK_PASSWORD=" + p.AdminPassword),
-	}
-
-	if p.AcceptLicense {
-		opts = append(
-			opts,
-			gnomock.WithEnv("SPLUNK_START_ARGS=--accept-license"),
-		)
-	}
-
-	if p.Values != nil || p.ValuesFile != "" {
-		init := p.initf()
-		opts = append(opts, gnomock.WithInit(init))
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func healthcheck(password string) gnomock.HealthcheckFunc {
-	return func(ctx context.Context, c *gnomock.Container) (err error) {
-		err = checkAPI(ctx, c, password)
-		if err != nil {
-			return err
-		}
-
-		err = checkHEC(ctx, c)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
+	_ = "STUB: not implemented"
+	return *new(gnomock.HealthcheckFunc)
 }
 
 func checkAPI(ctx context.Context, c *gnomock.Container, password string) error {
-	post := requestWithAuth(ctx, http.MethodPost, password, false)
-	uri := fmt.Sprintf("https://%s/services/auth/login", c.Address(APIPort))
-
-	data := url.Values{}
-	data.Add("username", "admin")
-	data.Add("password", password)
-	data.Add("output_mode", "json")
-	buf := bytes.NewBufferString(data.Encode())
-
-	_, err := post(uri, buf)
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func checkHEC(ctx context.Context, c *gnomock.Container) error {
-	get := requestWithAuth(ctx, http.MethodGet, "", false)
-	uri := fmt.Sprintf("https://%s/services/collector/health", c.Address(CollectorPort))
-
-	_, err := get(uri, bytes.NewBufferString(""))
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func insecureClient() http.Client {
-	return http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig:   &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
-			DisableKeepAlives: true,
-		},
-	}
-}
+func insecureClient() http.Client { _ = "STUB: not implemented"; return *new(http.Client) }
+
+//nolint:gosec

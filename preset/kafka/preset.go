@@ -7,13 +7,6 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
@@ -57,15 +50,7 @@ func init() {
 //
 // By default, this preset uses `lensesio/fast-data-dev` docker image with
 // version `2.5.1-L0` (version can be changed using `WithVersion`).
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 type TopicConfig struct {
 	Topic         string
@@ -84,256 +69,51 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/lensesio/fast-data-dev:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	namedPorts := make(gnomock.NamedPorts, 3)
-
-	bp := gnomock.TCP(brokerPort)
-	bp.HostPort = brokerPort
-	namedPorts[BrokerPort] = bp
-
-	namedPorts[ZooKeeperPort] = gnomock.TCP(zookeeperPort)
-	namedPorts[WebPort] = gnomock.TCP(webPort)
-	namedPorts[SchemaRegistryPort] = gnomock.TCP(schemaRegistryPort)
-
-	return namedPorts
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
-
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-		gnomock.WithEnv("KAFKA_AUTO_CREATE_TOPICS_ENABLE=true"),
-		gnomock.WithEnv("ADV_HOST=127.0.0.1"),
-		gnomock.WithEnv(fmt.Sprintf("BROKER_PORT=%d", brokerPort)),
-		gnomock.WithEnv("RUNTESTS=0"),
-		gnomock.WithEnv("RUNNING_SAMPLEDATA=0"),
-		gnomock.WithEnv("SAMPLEDATA=0"),
-	}
-
-	if len(p.Topics) > 0 || len(p.TopicConfigs) > 0 || len(p.Messages) > 0 {
-		opts = append(opts, gnomock.WithInit(p.initf))
-	}
-
-	return opts
-}
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
 func (p *P) healthcheck(ctx context.Context, c *gnomock.Container) (err error) {
-	conn, err := p.connect(c)
-	if err != nil {
-		return fmt.Errorf("can't connect to kafka: %w", err)
-	}
-
-	defer func() {
-		closeErr := conn.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	if _, err := conn.ApiVersions(); err != nil {
-		return fmt.Errorf("can't get version info: %w", err)
-	}
-
-	if err := conn.CreateTopics(kafka.TopicConfig{
-		Topic:             "gnomock",
-		ReplicationFactor: 1,
-		NumPartitions:     1,
-	}); err != nil {
-		return fmt.Errorf("can't create topic: %w", err)
-	}
-
-	group, err := kafka.NewConsumerGroup(kafka.ConsumerGroupConfig{
-		ID:      "gnomock",
-		Brokers: []string{c.Address(BrokerPort)},
-		Topics:  []string{"gnomock"},
-	})
-	if err != nil {
-		return fmt.Errorf("can't create consumer group: %w", err)
-	}
-
-	defer func() { _ = group.Close() }()
-
-	if _, err := group.Next(ctx); err != nil {
-		return fmt.Errorf("can't read next consumer group: %w", err)
-	}
-
-	if p.UseSchemaRegistry {
-		if err := p.healthcheckRegistry(ctx, c); err != nil {
-			return err
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (p *P) healthcheckRegistry(ctx context.Context, c *gnomock.Container) error {
-	url := "http://" + c.Address(SchemaRegistryPort)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return fmt.Errorf("invalid request: %w", err)
-	}
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("schema registry is not available: %w", err)
-	}
-
-	if err := res.Body.Close(); err != nil {
-		return fmt.Errorf("error closing schema registry response body: %w", err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func (p *P) initf(ctx context.Context, c *gnomock.Container) (err error) {
-	conn, err := p.connect(c)
-	if err != nil {
-		return fmt.Errorf("can't connect to kafka: %w", err)
-	}
-
-	defer func() {
-		closeErr := conn.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	return p.ingestMessageFiles(ctx, c, conn)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (p *P) ingestMessageFiles(ctx context.Context, c *gnomock.Container, conn *kafka.Conn) error {
-	if len(p.MessagesFiles) > 0 {
-		for _, fName := range p.MessagesFiles {
-			msgs, err := p.loadMessagesFromFile(fName)
-			if err != nil {
-				return fmt.Errorf("can't read messages from file '%s': %w", fName, err)
-			}
-
-			p.Messages = append(p.Messages, msgs...)
-		}
-	}
-
-	messagesByTopics := make(map[string][]Message)
-
-	for _, m := range p.Messages {
-		messagesByTopics[m.Topic] = append(messagesByTopics[m.Topic], m)
-	}
-
-	for topic := range messagesByTopics {
-		p.Topics = append(p.Topics, topic)
-	}
-
-	topics := make([]kafka.TopicConfig, 0, len(p.Topics)+len(p.TopicConfigs))
-
-	for _, topic := range p.Topics {
-		topics = append(topics, kafka.TopicConfig{
-			Topic:             topic,
-			ReplicationFactor: 1,
-			NumPartitions:     1,
-		})
-	}
-
-	for _, topic := range p.TopicConfigs {
-		topics = append(topics, kafka.TopicConfig{
-			Topic:             topic.Topic,
-			ReplicationFactor: 1, // cannot set more; cluster has just 1 node
-			NumPartitions:     topic.NumPartitions,
-		})
-	}
-
-	if err := conn.CreateTopics(topics...); err != nil {
-		return fmt.Errorf("can't create topics: %w", err)
-	}
-
-	for topic, messages := range messagesByTopics {
-		if err := p.sendMessagesIntoTopic(ctx, c.Address(BrokerPort), topic, messages); err != nil {
-			return fmt.Errorf("can't send messages into topic '%s': %w", topic, err)
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// cannot set more; cluster has just 1 node
+
 // nolint:gosec
 func (p *P) loadMessagesFromFile(fName string) (msgs []Message, err error) {
-	f, err := os.Open(fName)
-	if err != nil {
-		return nil, fmt.Errorf("can't open messages file '%s': %w", fName, err)
-	}
-
-	defer func() {
-		closeErr := f.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	decoder := json.NewDecoder(f)
-
-	for {
-		var m Message
-
-		err = decoder.Decode(&m)
-		if errors.Is(err, io.EOF) {
-			break
-		}
-
-		if err != nil {
-			return nil, fmt.Errorf("can't read message from file '%s': %w", fName, err)
-		}
-
-		msgs = append(msgs, m)
-	}
-
-	return msgs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *P) connect(c *gnomock.Container) (*kafka.Conn, error) {
-	return kafka.Dial("tcp", c.Address(BrokerPort))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // nolint: lll
 func (p *P) sendMessagesIntoTopic(ctx context.Context, brokerAddr, topic string, messages []Message) (err error) {
-	w := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:  []string{brokerAddr},
-		Topic:    topic,
-		Balancer: &kafka.LeastBytes{},
-	})
-
-	defer func() {
-		closeErr := w.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	kafkaMessages := make([]kafka.Message, len(messages))
-
-	for i, m := range messages {
-		kafkaMessages[i] = kafka.Message{
-			Key:   []byte(m.Key),
-			Value: []byte(m.Value),
-			Time:  time.Unix(0, m.Time),
-		}
-	}
-
-	if err := w.WriteMessages(ctx, kafkaMessages...); err != nil {
-		return fmt.Errorf("write messages failed: %w", err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }

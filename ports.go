@@ -2,7 +2,6 @@ package gnomock
 
 import (
 	"errors"
-	"strings"
 )
 
 // DefaultPort should be used with simple containers that expose only one TCP
@@ -33,17 +32,11 @@ type Port struct {
 // single TCP port. Use it to create default named port for the provided port
 // number. Pass DefaultPort to Address() method to get the address of the
 // default port.
-func DefaultTCP(port int) NamedPorts {
-	return NamedPorts{
-		DefaultPort: Port{Protocol: "tcp", Port: port},
-	}
-}
+func DefaultTCP(port int) NamedPorts { _ = "STUB: not implemented"; return *new(NamedPorts) }
 
 // TCP returns a Port with the provided number and "tcp" protocol. This is a
 // utility function, it is equivalent to creating a Port explicitly.
-func TCP(port int) Port {
-	return Port{Protocol: "tcp", Port: port}
-}
+func TCP(port int) Port { _ = "STUB: not implemented"; return *new(Port) }
 
 // NamedPorts is a collection of ports exposed by a container, where every
 // exposed port is given a name. Some examples of names are "web" or "api" for
@@ -54,18 +47,15 @@ type NamedPorts map[string]Port
 // Get returns a port with the provided name. An empty value is returned if
 // there are no ports with the given name.
 func (p NamedPorts) Get(name string) Port {
-	return p[name]
+	_ = "STUB: not implemented"
+
+	// Find returns the name of a port with the provided protocol and number. Use
+	// this method to find out the name of an exposed ports, when port number and
+	// protocol are known.
+	return *new(Port)
 }
 
-// Find returns the name of a port with the provided protocol and number. Use
-// this method to find out the name of an exposed ports, when port number and
-// protocol are known.
 func (p NamedPorts) Find(proto string, portNum int) (string, error) {
-	for name, port := range p {
-		if strings.EqualFold(proto, port.Protocol) && portNum == port.Port {
-			return name, nil
-		}
-	}
-
-	return "", ErrPortNotFound
+	_ = "STUB: not implemented"
+	return "", nil
 }

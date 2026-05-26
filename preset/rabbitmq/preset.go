@@ -3,13 +3,6 @@ package rabbitmq
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"net/http"
-	"os"
-	"strings"
 
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
@@ -51,15 +44,7 @@ func init() {
 //
 // When used without specifying username/password, default ones are used:
 // guest/guest. Default version for this preset is 3.8.9.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation of RabbitMQ.
 type P struct {
@@ -71,231 +56,51 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/library/rabbitmq:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	namedPorts := gnomock.DefaultTCP(defaultPort)
-
-	if p.isManagement() {
-		namedPorts[ManagementPort] = gnomock.Port{Protocol: "tcp", Port: managementPort}
-	}
-
-	return namedPorts
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
-
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-	}
-
-	if p.User != "" && p.Password != "" {
-		opts = append(
-			opts,
-			gnomock.WithEnv("RABBITMQ_DEFAULT_USER="+p.User),
-			gnomock.WithEnv("RABBITMQ_DEFAULT_PASS="+p.Password),
-		)
-	}
-
-	if len(p.Messages)+len(p.MessagesFiles) > 0 {
-		opts = append(opts, gnomock.WithInit(p.initf))
-	}
-
-	return opts
-}
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
 func (p *P) healthcheck(ctx context.Context, c *gnomock.Container) error {
-	conn, err := p.connect(c)
-	if err != nil {
-		return fmt.Errorf("connection failed: %w", err)
-	}
-
-	if err := conn.Close(); err != nil {
-		return fmt.Errorf("can't close connection: %w", err)
-	}
-
-	if p.isManagement() {
-		url := fmt.Sprintf("http://%s/api/overview", c.Address(ManagementPort))
-
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-		if err != nil {
-			return err
-		}
-
-		// any non-err response is valid, it is most likely 401 Unauthorized
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return err
-		}
-
-		_ = resp.Body.Close()
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
+// any non-err response is valid, it is most likely 401 Unauthorized
 
-	if p.User == "" && p.Password == "" {
-		p.User = defaultUser
-		p.Password = defaultPassword
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func (p *P) initf(ctx context.Context, c *gnomock.Container) (err error) {
-	conn, err := p.connect(c)
-	if err != nil {
-		return fmt.Errorf("can't connect to rabbitmq: %w", err)
-	}
-
-	defer func() {
-		closeErr := conn.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	return p.ingestMessages(ctx, conn)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (p *P) ingestMessages(ctx context.Context, conn *amqp.Connection) error {
-	if err := p.loadFiles(); err != nil {
-		return err
-	}
-
-	messagesByQueue := make(map[string][]Message)
-	for _, m := range p.Messages {
-		messagesByQueue[m.Queue] = append(messagesByQueue[m.Queue], m)
-	}
-
-	queues := make([]string, 0, len(messagesByQueue))
-	for q := range messagesByQueue {
-		queues = append(queues, q)
-	}
-
-	ch, err := conn.Channel()
-	if err != nil {
-		return fmt.Errorf("can't open channel: %w", err)
-	}
-
-	defer func() {
-		closeErr := ch.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	if err := declareQueues(ch, queues); err != nil {
-		return err
-	}
-
-	for queue, messages := range messagesByQueue {
-		if err := p.sendMessagesIntoQueue(ctx, ch, queue, messages); err != nil {
-			return fmt.Errorf("can't send messages into queue '%s': %w", queue, err)
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (p *P) loadFiles() error {
-	if len(p.MessagesFiles) > 0 {
-		for _, fName := range p.MessagesFiles {
-			msgs, err := p.loadMessagesFromFile(fName)
-			if err != nil {
-				return fmt.Errorf("can't read messages from file '%s': %w", fName, err)
-			}
+func (p *P) loadFiles() error { _ = "STUB: not implemented"; return nil }
 
-			p.Messages = append(p.Messages, msgs...)
-		}
-	}
+func declareQueues(ch *amqp.Channel, qs []string) error { _ = "STUB: not implemented"; return nil }
 
-	return nil
-}
-
-func declareQueues(ch *amqp.Channel, qs []string) error {
-	for _, queue := range qs {
-		if _, err := ch.QueueDeclare(queue, false, false, false, false, nil); err != nil {
-			return fmt.Errorf("can't open queue '%s': %w", queue, err)
-		}
-	}
-
-	return nil
-}
-
-func (p *P) isManagement() bool {
-	return strings.Contains(p.Version, "management")
-}
+func (p *P) isManagement() bool { _ = "STUB: not implemented"; return false }
 
 // nolint:gosec
 func (p *P) loadMessagesFromFile(fName string) (msgs []Message, err error) {
-	f, err := os.Open(fName)
-	if err != nil {
-		return nil, fmt.Errorf("can't open messages file '%s': %w", fName, err)
-	}
-
-	defer func() {
-		closeErr := f.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	decoder := json.NewDecoder(f)
-
-	for {
-		var m Message
-
-		err = decoder.Decode(&m)
-		if errors.Is(err, io.EOF) {
-			break
-		}
-
-		if err != nil {
-			return nil, fmt.Errorf("can't read message from file '%s': %w", fName, err)
-		}
-
-		msgs = append(msgs, m)
-	}
-
-	return msgs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *P) connect(c *gnomock.Container) (*amqp.Connection, error) {
-	return amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d", p.User, p.Password, c.Host, c.DefaultPort()))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (p *P) sendMessagesIntoQueue(ctx context.Context, ch *amqp.Channel, q string, msgs []Message) (err error) {
-	for _, m := range msgs {
-		var body []byte
-		if m.Body != nil {
-			body = m.Body
-		} else {
-			body = []byte(m.StringBody)
-		}
-
-		if err := ch.PublishWithContext(
-			ctx,
-			"",
-			q,
-			false,
-			false,
-			amqp.Publishing{
-				ContentType: m.ContentType,
-				Body:        body,
-			},
-		); err != nil {
-			return fmt.Errorf("publish message failed: %w", err)
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }

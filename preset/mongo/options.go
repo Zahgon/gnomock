@@ -21,26 +21,13 @@ type Option func(*P)
 // Top level files under "path" are ignored, only directories are used.
 // Similarly, directories located anywhere besides top-level "path", are also
 // ignored.
-func WithData(path string) Option {
-	return func(p *P) {
-		p.DataPath = path
-	}
-}
+func WithData(path string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithUser creates a root user with the provided name and password. This user
 // should be used as a part of mongodb connection string. If you choose not to
 // use your own user and password, the databases will be unprotected, and you
 // won't need to specify any name and password in your connection string.
-func WithUser(user, pass string) Option {
-	return func(p *P) {
-		p.User = user
-		p.Password = pass
-	}
-}
+func WithUser(user, pass string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithVersion sets image version.
-func WithVersion(version string) Option {
-	return func(o *P) {
-		o.Version = version
-	}
-}
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }

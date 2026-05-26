@@ -4,9 +4,6 @@
 package azurite
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -30,15 +27,7 @@ func init() {
 
 // Preset creates a new azurite preset to use with gnomock.Start. See
 // package docs for a list of exposed ports.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset blobstorage implementation.
 type P struct {
@@ -47,62 +36,26 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("mcr.microsoft.com/azure-storage/azurite:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.NamedPorts{
-		BlobServicePort:  {Protocol: "tcp", Port: 10000},
-		QueueServicePort: {Protocol: "tcp", Port: 10001},
-		TableServicePort: {Protocol: "tcp", Port: 10002},
-	}
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck()),
-		gnomock.WithEnv(fmt.Sprintf("AZURITE_ACCOUNTS=%s:%s", AccountName, AccountKey)),
-		gnomock.WithInit(p.initf()),
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = DefaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func (p *P) healthcheck() gnomock.HealthcheckFunc {
-	return func(_ context.Context, c *gnomock.Container) (err error) {
-		// needs implementation. unfortunately azurite does not offer a health endpoint
-		// a netcat p.healtCheckAddress(c) -z could help alternatively
-		_ = p.healthCheckAddress(c)
-		return nil
-	}
+	_ = "STUB: not implemented"
+	return *new(gnomock.HealthcheckFunc)
 }
+
+// needs implementation. unfortunately azurite does not offer a health endpoint
+// a netcat p.healtCheckAddress(c) -z could help alternatively
 
 // healthCheckAddress returns the address of azurite blobstorage endpoint of a running
 // azurite container.
-func (p *P) healthCheckAddress(c *gnomock.Container) string {
-	defaultPath := c.Address(BlobServicePort)
+func (p *P) healthCheckAddress(c *gnomock.Container) string { _ = "STUB: not implemented"; return "" }
 
-	return defaultPath
-}
-
-func (p *P) initf() gnomock.InitFunc {
-	return func(_ context.Context, c *gnomock.Container) error {
-		err := p.initBlobstorage(c)
-		if err != nil {
-			return fmt.Errorf("can't init blob storage: %w", err)
-		}
-
-		return nil
-	}
-}
+func (p *P) initf() gnomock.InitFunc { _ = "STUB: not implemented"; return *new(gnomock.InitFunc) }

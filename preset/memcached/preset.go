@@ -5,9 +5,7 @@ package memcached
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -21,15 +19,7 @@ func init() {
 // Preset creates a new Gmomock Memcached preset. This preset includes a Memcached
 // specific healthcheck function, default Memcached image and port, and allows to
 // optionally set up initial state.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation for Memcached storage.
 type P struct {
@@ -39,66 +29,17 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/library/memcached:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(11211)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(healthcheck),
-	}
-
-	if p.ByteValues != nil || p.Values != nil {
-		initf := func(_ context.Context, c *gnomock.Container) error {
-			addr := c.Address(gnomock.DefaultPort)
-			client := memcache.New(addr)
-
-			if p.ByteValues != nil {
-				for k, v := range p.ByteValues {
-					err := client.Set(&memcache.Item{Key: k, Value: v, Expiration: 0})
-					if err != nil {
-						return fmt.Errorf("can't set '%s'='%v': %w", k, v, err)
-					}
-				}
-			}
-
-			if p.Values != nil {
-				for k, v := range p.Values {
-					err := client.Set(&memcache.Item{Key: k, Value: []byte(v), Expiration: 0})
-					if err != nil {
-						return fmt.Errorf("can't set '%s'='%v': %w", k, v, err)
-					}
-				}
-			}
-
-			return nil
-		}
-
-		opts = append(opts, gnomock.WithInit(initf))
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func healthcheck(_ context.Context, c *gnomock.Container) error {
-	addr := c.Address(gnomock.DefaultPort)
-	client := memcache.New(addr)
-
-	defer func() { _ = client.Close() }()
-
-	return client.Ping()
+	_ = "STUB: not implemented"
+	return nil
 }

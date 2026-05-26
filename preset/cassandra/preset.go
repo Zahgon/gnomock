@@ -8,9 +8,7 @@ package cassandra
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/gocql/gocql"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -34,15 +32,7 @@ func init() {
 //
 // Containers created using this preset should be accessed using
 // cassandra/cassandra username/password pair.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation for Cassandra.
 type P struct {
@@ -50,45 +40,17 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/library/cassandra:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(defaultPort)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func (p *P) healthcheck(_ context.Context, c *gnomock.Container) error {
-	cluster := gocql.NewCluster(c.DefaultAddress())
-	cluster.Authenticator = gocql.PasswordAuthenticator{
-		Username: DefaultUser,
-		Password: DefaultPassword,
-	}
-
-	session, err := cluster.CreateSession()
-	if err != nil {
-		return fmt.Errorf("failed to create a new session: %w", err)
-	}
-
-	session.Close()
-
+	_ = "STUB: not implemented"
 	return nil
 }

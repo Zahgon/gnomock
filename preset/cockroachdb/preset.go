@@ -13,8 +13,6 @@ package cockroachdb
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
 
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/orlangure/gnomock"
@@ -33,15 +31,7 @@ func init() {
 
 // Preset creates a new Gmomock CockroachDB preset. This preset includes a CockroachDB
 // specific healthcheck function and default CockroachDB image and port.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation for CockroachDB.
 type P struct {
@@ -52,111 +42,26 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/cockroachdb/cockroach:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(defaultPort)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(healthcheck),
-		gnomock.WithCommand("start-single-node", "--insecure"),
-		gnomock.WithInit(p.initf()),
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-
-	if p.DB == "" {
-		p.DB = defaultDatabase
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func healthcheck(_ context.Context, c *gnomock.Container) error {
-	db, err := connect(c, "")
-	if err != nil {
-		if db != nil {
-			_ = db.Close()
-		}
-
-		return err
-	}
-
-	defer func() {
-		_ = db.Close()
-	}()
-
-	var one int
-
-	return db.QueryRow(`select 1`).Scan(&one)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *P) initf() gnomock.InitFunc {
-	return func(_ context.Context, c *gnomock.Container) error {
-		db, err := connect(c, "")
-		if err != nil {
-			return err
-		}
+func (p *P) initf() gnomock.InitFunc { _ = "STUB: not implemented"; return *new(gnomock.InitFunc) }
 
-		_, err = db.Exec("create database " + p.DB)
-		if err != nil {
-			_ = db.Close()
-			return err
-		}
-
-		_ = db.Close()
-
-		db, err = connect(c, p.DB)
-		if err != nil {
-			return err
-		}
-
-		defer func() { _ = db.Close() }()
-
-		if len(p.QueriesFiles) > 0 {
-			for _, f := range p.QueriesFiles {
-				bs, err := os.ReadFile(f) // nolint:gosec
-				if err != nil {
-					return fmt.Errorf("can't read queries file '%s': %w", f, err)
-				}
-
-				p.Queries = append([]string{string(bs)}, p.Queries...)
-			}
-		}
-
-		for _, q := range p.Queries {
-			_, err = db.Exec(q)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-}
+// nolint:gosec
 
 func connect(c *gnomock.Container, db string) (*sql.DB, error) {
-	connStr := fmt.Sprintf(
-		"host=%s port=%d sslmode=disable user=root dbname=%s",
-		c.Host, c.Port(gnomock.DefaultPort), db,
-	)
-
-	conn, err := sql.Open("postgres", connStr)
-	if err != nil {
-		return nil, err
-	}
-
-	return conn, conn.Ping()
+	_ = "STUB: not implemented"
+	return nil, nil
 }

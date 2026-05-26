@@ -30,22 +30,13 @@ package k3s
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"path/filepath"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 const (
@@ -145,15 +136,7 @@ func init() {
 // note that this preset launches a privileged docker container.
 //
 // By default, this preset sets up k3s v1.19.3.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation of lightweight kubernetes (k3s).
 type P struct {
@@ -170,160 +153,34 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/rancher/k3s:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	port := gnomock.TCP(p.Port)
-
-	if !p.UseDynamicPort {
-		port.HostPort = p.Port
-	}
-
-	return gnomock.NamedPorts{
-		gnomock.DefaultPort: port,
-		KubeConfigPortName:  gnomock.TCP(kubeconfigPort),
-	}
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
-
-	httpdManifestB64 := base64.StdEncoding.EncodeToString(kubeConfigHTTPJSONBytes)
-	httpdManifestPath := filepath.Join(k3sManifestsDir, "kubeconfig-httpd.json")
-	writeHttpdManifestCmd := fmt.Sprintf(
-		`mkdir -p %s && echo "%s" | base64 -d > "%s"`,
-		filepath.Dir(httpdManifestPath),
-		httpdManifestB64,
-		httpdManifestPath,
-	)
-
-	k3sServerCmd := fmt.Sprintf(
-		`/bin/k3s server --https-listen-port %d %s`,
-		p.Port,
-		strings.Join(p.K3sServerFlags, " "),
-	)
-
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-		gnomock.WithPrivileged(),
-		gnomock.WithEnv("K3S_KUBECONFIG_OUTPUT=/var/gnomock/kubeconfig.yaml"),
-		gnomock.WithEnv("K3S_KUBECONFIG_MODE=644"),
-		gnomock.WithEntrypoint(
-			"/bin/sh", "-c",
-			fmt.Sprintf(`%s && %s`, writeHttpdManifestCmd, k3sServerCmd),
-		),
-	}
-
-	return opts
-}
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
 func (p *P) healthcheck(ctx context.Context, c *gnomock.Container) (err error) {
-	kubeconfig, err := Config(c)
-	if err != nil {
-		return fmt.Errorf("failed to get kubeconfig: %w", err)
-	}
-
-	// this is valid only for health checks, and solves a problem where
-	// gnomockd performs these calls from within its own container by accessing
-	// the cluster at 172.0.0.1, which is not one of the addresses in the
-	// certificate
-	kubeconfig.Host = c.DefaultAddress()
-
-	client, err := kubernetes.NewForConfig(kubeconfig)
-	if err != nil {
-		return fmt.Errorf("failed to create kubernetes client from kubeconfig: %w", err)
-	}
-
-	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list cluster nodes: %w", err)
-	}
-
-	if len(nodes.Items) == 0 {
-		return fmt.Errorf("no nodes found in cluster")
-	}
-
-	sas, err := client.CoreV1().ServiceAccounts(metav1.NamespaceDefault).List(ctx, metav1.ListOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to list service accounts: %w", err)
-	}
-
-	if len(sas.Items) == 0 {
-		return fmt.Errorf("no service accounts found in cluster")
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
+// this is valid only for health checks, and solves a problem where
+// gnomockd performs these calls from within its own container by accessing
+// the cluster at 172.0.0.1, which is not one of the addresses in the
+// certificate
 
-	if p.Port == 0 {
-		p.Port = defaultAPIPort
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 // ConfigBytes returns file contents of kubeconfig file that should be used to
 // connect to the cluster running in the provided container.
 func ConfigBytes(c *gnomock.Container) (configBytes []byte, err error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	url := fmt.Sprintf("http://%s/kubeconfig.yaml", c.Address(KubeConfigPortName))
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("kubeconfig unavailable: %w", err)
-	}
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("kubeconfig unavailable: %w", err)
-	}
-
-	defer func() {
-		closeErr := res.Body.Close()
-		if err == nil && closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("invalid kubeconfig response code '%d'", res.StatusCode)
-	}
-
-	configBytes, err = io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("can't read kubeconfig body: %w", err)
-	}
-
-	configBytes = reServerAddress.ReplaceAll(
-		configBytes,
-		[]byte("https://"+c.DefaultAddress()),
-	)
-
-	return configBytes, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Config returns `*rest.Config` instance of Kubernetes client-go package. This
 // config can be used to create a new client that will work against k3s cluster
 // running in the provided container.
-func Config(c *gnomock.Container) (*rest.Config, error) {
-	configBytes, err := ConfigBytes(c)
-	if err != nil {
-		return nil, fmt.Errorf("can't get kubeconfig bytes: %w", err)
-	}
-
-	kubeconfig, err := clientcmd.RESTConfigFromKubeConfig(configBytes)
-	if err != nil {
-		return nil, fmt.Errorf("can't create kubeconfig from bytes: %w", err)
-	}
-
-	return kubeconfig, nil
-}
+func Config(c *gnomock.Container) (*rest.Config, error) { _ = "STUB: not implemented"; return nil, nil }

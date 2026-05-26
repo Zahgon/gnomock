@@ -5,38 +5,17 @@ package influxdb
 type Option func(*P)
 
 // WithVersion sets image version.
-func WithVersion(version string) Option {
-	return func(o *P) {
-		o.Version = version
-	}
-}
+func WithVersion(version string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithUser sets super-user name and password for this container.
-func WithUser(username, password string) Option {
-	return func(p *P) {
-		p.Username = username
-		p.Password = password
-	}
-}
+func WithUser(username, password string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithOrg sets organization name for this container.
-func WithOrg(org string) Option {
-	return func(p *P) {
-		p.Org = org
-	}
-}
+func WithOrg(org string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithBucket sets the initial bucket name for this container.
-func WithBucket(bucket string) Option {
-	return func(p *P) {
-		p.Bucket = bucket
-	}
-}
+func WithBucket(bucket string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithAuthToken sets authentication token to be used to connect to this
 // container.
-func WithAuthToken(token string) Option {
-	return func(p *P) {
-		p.AuthToken = token
-	}
-}
+func WithAuthToken(token string) Option { _ = "STUB: not implemented"; return *new(Option) }

@@ -8,10 +8,7 @@ package influxdb
 
 import (
 	"context"
-	"fmt"
 
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/domain"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -32,15 +29,7 @@ func init() {
 
 // Preset creates a new Gmomock InfluxDB preset. This preset includes a
 // InfluxDB specific healthcheck function and default InfluxDB image and port.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation for InfluxDB.
 type P struct {
@@ -53,81 +42,17 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/influxdb:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(defaultPort)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-		gnomock.WithEnv("DOCKER_INFLUXDB_INIT_MODE=setup"),
-		gnomock.WithEnv("DOCKER_INFLUXDB_INIT_USERNAME=" + p.Username),
-		gnomock.WithEnv("DOCKER_INFLUXDB_INIT_PASSWORD=" + p.Password),
-		gnomock.WithEnv("DOCKER_INFLUXDB_INIT_ORG=" + p.Org),
-		gnomock.WithEnv("DOCKER_INFLUXDB_INIT_BUCKET=" + p.Bucket),
-		gnomock.WithEnv("DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=" + p.AuthToken),
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-
-	if p.Username == "" {
-		p.Username = defaultUsername
-	}
-
-	if p.Password == "" {
-		p.Password = defaultPassword
-	}
-
-	if p.Org == "" {
-		p.Org = defaultOrg
-	}
-
-	if p.Bucket == "" {
-		p.Bucket = defaultBucket
-	}
-
-	if p.AuthToken == "" {
-		p.AuthToken = defaultAuthToken
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func (p *P) healthcheck(ctx context.Context, c *gnomock.Container) error {
-	addr := fmt.Sprintf("http://%s", c.DefaultAddress())
-	client := influxdb2.NewClient(addr, p.AuthToken)
-
-	defer client.Close()
-
-	h, err := client.Health(ctx)
-	if err != nil {
-		return fmt.Errorf("influxdb Health() return error: %w", err)
-	}
-
-	if h.Status != domain.HealthCheckStatusPass {
-		return fmt.Errorf("unexpected health status '%s'", h.Status)
-	}
-
-	buckets, err := client.BucketsAPI().FindBucketsByOrgName(ctx, p.Org)
-	if err != nil {
-		return fmt.Errorf("can't list influxdb buckets: %w", err)
-	}
-
-	if len(*buckets) == 0 {
-		return fmt.Errorf("no buckets exist")
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }

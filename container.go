@@ -1,11 +1,5 @@
 package gnomock
 
-import (
-	"fmt"
-	"os"
-	"strings"
-)
-
 // Container represents a docker container created for testing. Host and Ports
 // fields should be used to configure the connection to this container. ID
 // matches the original docker container ID.
@@ -31,59 +25,23 @@ type Container struct {
 // connect to this container. If a container was created with DefaultTCP call,
 // use DefaultPort as the name. Otherwise, use the name of one of the ports
 // used during setup.
-func (c *Container) Address(name string) string {
-	p := c.Port(name)
-	if p == 0 {
-		return ""
-	}
-
-	return fmt.Sprintf("%s:%d", c.Host, p)
-}
+func (c *Container) Address(name string) string { _ = "STUB: not implemented"; return "" }
 
 // DefaultAddress return Address() with DefaultPort.
-func (c *Container) DefaultAddress() string {
-	return c.Address(DefaultPort)
-}
+func (c *Container) DefaultAddress() string { _ = "STUB: not implemented"; return "" }
 
 // Port is a convenience function that returns port number with the provided
 // name.
-func (c *Container) Port(name string) int {
-	return c.Ports.Get(name).Port
-}
+func (c *Container) Port(name string) int { _ = "STUB: not implemented"; return 0 }
 
 // DefaultPort returns Port() with DefaultPort.
-func (c *Container) DefaultPort() int {
-	return c.Port(DefaultPort)
-}
+func (c *Container) DefaultPort() int { _ = "STUB: not implemented"; return 0 }
 
 // DockerID returns the ID of this container as known to Docker.
-func (c *Container) DockerID() string {
-	id, _ := parseID(c.ID)
-	return id
-}
+func (c *Container) DockerID() string { _ = "STUB: not implemented"; return "" }
 
-func isInDocker() bool {
-	env := os.Getenv("GNOMOCK_ENV")
-	return env == "gnomockd"
-}
+func isInDocker() bool { _ = "STUB: not implemented"; return false }
 
-func generateID(id, sidecar string) string {
-	if len(id) > 10 {
-		id = id[:10]
-	}
+func generateID(id, sidecar string) string { _ = "STUB: not implemented"; return "" }
 
-	if len(sidecar) > 10 {
-		sidecar = sidecar[:10]
-	}
-
-	return fmt.Sprintf("%s-%s", id, sidecar)
-}
-
-func parseID(input string) (id, sidecar string) {
-	parts := strings.Split(input, "-")
-	if len(parts) != 2 {
-		return input, ""
-	}
-
-	return parts[0], parts[1]
-}
+func parseID(input string) (id, sidecar string) { _ = "STUB: not implemented"; return "", "" }

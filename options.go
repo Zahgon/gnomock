@@ -18,166 +18,93 @@ type Option func(*Options)
 
 // WithContext sets the provided context to be used for setting up a Gnomock
 // container. Canceling this context will cause Start() to abort.
-func WithContext(ctx context.Context) Option {
-	return func(o *Options) {
-		o.ctx = ctx
-	}
-}
+func WithContext(ctx context.Context) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithInit lets the provided InitFunc to be called when a Gnomock container is
 // created, but before Start() returns. Use this function to run arbitrary code
 // on the new container before using it. It can be useful to bring the
 // container to a certain state (e.g create SQL schema).
-func WithInit(f InitFunc) Option {
-	return func(o *Options) {
-		o.init = f
-	}
-}
+func WithInit(f InitFunc) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithHealthCheck allows to define a rule to consider a Gnomock container
 // ready to use. For example, it can attempt to connect to this container, and
 // return an error on any failure, or nil on success. This function is called
 // repeatedly until the timeout is reached, or until a nil error is returned.
-func WithHealthCheck(f HealthcheckFunc) Option {
-	return func(o *Options) {
-		o.healthcheck = f
-	}
-}
+func WithHealthCheck(f HealthcheckFunc) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithHealthCheckInterval defines an interval between two consecutive health
 // check calls. This is a constant interval.
 func WithHealthCheckInterval(t time.Duration) Option {
-	return func(o *Options) {
-		o.healthcheckInterval = t
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithTimeout sets the amount of time to wait for a created container to
 // become ready to use. All startup steps must complete before they time out:
 // start, wait until healthy, init.
-func WithTimeout(t time.Duration) Option {
-	return func(o *Options) {
-		o.Timeout = t
-	}
-}
+func WithTimeout(t time.Duration) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithEnv adds environment variable to the container. For example,
 // `AWS_ACCESS_KEY_ID=FOOBARBAZ`.
-func WithEnv(env string) Option {
-	return func(o *Options) {
-		o.Env = append(o.Env, env)
-	}
-}
+func WithEnv(env string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithLogWriter sets the target where to write container logs. This can be
 // useful for debugging.
-func WithLogWriter(w io.Writer) Option {
-	return func(o *Options) {
-		o.logWriter = w
-	}
-}
+func WithLogWriter(w io.Writer) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithDebugMode allows Gnomock to output internal messages for debug purposes.
 // Containers created in debug mode will not be automatically removed on
 // failure to setup their initial state. Containers still might be removed if
 // they are shut down from the inside. Use WithLogWriter to see what happens
 // inside.
-func WithDebugMode() Option {
-	return func(o *Options) {
-		o.Debug = true
-	}
-}
+func WithDebugMode() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithContainerName allows to give a specific name to a new container. If a
 // container with the same name already exists, it is killed.
-func WithContainerName(name string) Option {
-	return func(o *Options) {
-		o.ContainerName = name
-	}
-}
+func WithContainerName(name string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithPrivileged starts a container in privileged mode (like `docker run
 // --privileged`). This option should not be used unless you really need it.
 // One use case for this option would be to run a Preset that has some kind of
 // docker-in-docker functionality.
-func WithPrivileged() Option {
-	return func(o *Options) {
-		o.Privileged = true
-	}
-}
+func WithPrivileged() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithOptions allows to provide an existing set of Options instead of using
 // optional configuration.
 //
 // This way has its own limitations. For example, context or initialization
 // functions cannot be set in this way.
-func WithOptions(options *Options) Option {
-	return func(o *Options) {
-		if options.Timeout > 0 {
-			o.Timeout = options.Timeout
-		}
-
-		if options.CustomNamedPorts != nil {
-			o.CustomNamedPorts = options.CustomNamedPorts
-		}
-
-		o.Env = append(o.Env, options.Env...)
-		o.Debug = options.Debug
-		o.ContainerName = options.ContainerName
-	}
-}
+func WithOptions(options *Options) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithCommand sets the command and its arguments to execute when container
 // first runs. This command replaces the command defined in docker image.
-func WithCommand(cmd string, args ...string) Option {
-	return func(o *Options) {
-		o.Cmd = append([]string{cmd}, args...)
-	}
-}
+func WithCommand(cmd string, args ...string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithEntrypoint overwrites the entrypoint, and its arguments, defined
 // in the original docker image.
 func WithEntrypoint(entrypoint string, args ...string) Option {
-	return func(o *Options) {
-		o.Entrypoint = append([]string{entrypoint}, args...)
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithHostMounts allows to bind host path (`src`) inside the container under
 // `dst` path.
-func WithHostMounts(src, dst string) Option {
-	return func(o *Options) {
-		if o.HostMounts == nil {
-			o.HostMounts = make(map[string]string)
-		}
-
-		o.HostMounts[src] = dst
-	}
-}
+func WithHostMounts(src, dst string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithDisableAutoCleanup disables auto-removal of this container when the
 // tests complete. Automatic cleanup is a safety net for tests that for some
 // reason fail to run `gnomock.Stop()` in the end, for example due to an
 // unexpected `os.Exit()` somewhere.
-func WithDisableAutoCleanup() Option {
-	return func(o *Options) {
-		o.DisableAutoCleanup = true
-	}
-}
+func WithDisableAutoCleanup() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithUseLocalImagesFirst if possible to avoid hitting the Docker Hub pull rate limit.
-func WithUseLocalImagesFirst() Option {
-	return func(o *Options) {
-		o.UseLocalImagesFirst = true
-	}
-}
+func WithUseLocalImagesFirst() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithCustomNamedPorts allows to define custom ports for a container. This
 // option should be used to override the ports defined by presets.
 func WithCustomNamedPorts(namedPorts NamedPorts) Option {
-	return func(o *Options) {
-		o.CustomNamedPorts = namedPorts
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithRegistryAuth allows to access private docker images. The credentials
@@ -189,46 +116,26 @@ func WithCustomNamedPorts(namedPorts NamedPorts) Option {
 //
 // For example: eyJ1c2VybmFtZSI6ImZvbyIsInBhc3N3b3JkIjoiYmFyIn0K which stands
 // for {"username":"foo","password":"bar"}.
-func WithRegistryAuth(auth string) Option {
-	return func(o *Options) {
-		o.Auth = auth
-	}
-}
+func WithRegistryAuth(auth string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithContainerReuse disables Gnomock default behavior of automatic container
 // cleanup and also disables the automatic replacement at startup of an existing
 // container with the same name and image. Effectively this makes Gnomock reuse
 // a container from a previous Gnomock execution.
-func WithContainerReuse() Option {
-	return func(o *Options) {
-		o.Reuse = true
-	}
-}
+func WithContainerReuse() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithExtraHosts allows to provide custom entries to the hosts file of the container.
 // It is similar to the `--add-host` flag of docker.
-func WithExtraHosts(hosts []string) Option {
-	return func(o *Options) {
-		o.ExtraHosts = hosts
-	}
-}
+func WithExtraHosts(hosts []string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithCustomImage allows to define a custom image name. This option should be used to
 // override the image registry and repository defined by presets.
-func WithCustomImage(image string) Option {
-	return func(o *Options) {
-		o.CustomImage = image
-	}
-}
+func WithCustomImage(image string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithUser sets the user that the container should run as. It accepts a string
 // value that can be a username/group or UID/GID, in the format accepted by the
 // docker run --user flag (e.g., "1000", "1000:1000", "user:group").
-func WithUser(user string) Option {
-	return func(o *Options) {
-		o.User = user
-	}
-}
+func WithUser(user string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // HealthcheckFunc defines a function to be used to determine container health.
 // It receives a host and a port, and returns an error if the container is not
@@ -238,21 +145,25 @@ func WithUser(user string) Option {
 type HealthcheckFunc func(context.Context, *Container) error
 
 func nopHealthcheck(context.Context, *Container) error {
+	_ = "STUB: not implemented"
+
+	// InitFunc defines a function to be called on a ready to use container to set
+	// up its initial state before running the tests. For example, InitFunc can
+	// take care of creating a SQL table and inserting test data into it.
 	return nil
 }
 
-// InitFunc defines a function to be called on a ready to use container to set
-// up its initial state before running the tests. For example, InitFunc can
-// take care of creating a SQL table and inserting test data into it.
 type InitFunc func(context.Context, *Container) error
 
 func nopInit(context.Context, *Container) error {
+	_ = "STUB: not implemented"
+
+	// Options includes Gnomock startup configuration. Functional options
+	// (WithSomething) should be used instead of directly initializing objects of
+	// this type whenever possible.
 	return nil
 }
 
-// Options includes Gnomock startup configuration. Functional options
-// (WithSomething) should be used instead of directly initializing objects of
-// this type whenever possible.
 type Options struct {
 	// Timeout is an amount of time to wait before considering Start operation
 	// as failed.
@@ -343,19 +254,4 @@ type Options struct {
 	logWriter           io.Writer
 }
 
-func buildConfig(opts ...Option) *Options {
-	config := &Options{
-		ctx:                 context.Background(),
-		init:                nopInit,
-		healthcheck:         nopHealthcheck,
-		healthcheckInterval: defaultHealthcheckInterval,
-		Timeout:             defaultTimeout,
-		logWriter:           io.Discard,
-	}
-
-	for _, opt := range opts {
-		opt(config)
-	}
-
-	return config
-}
+func buildConfig(opts ...Option) *Options { _ = "STUB: not implemented"; return nil }

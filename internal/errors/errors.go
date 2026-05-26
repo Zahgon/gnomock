@@ -2,21 +2,12 @@
 package errors
 
 import (
-	"errors"
-	"fmt"
-	"net/http"
-
 	"github.com/orlangure/gnomock"
 )
 
 // NewPresetNotFoundError is returned when an invalid/unknown preset name was
 // used.
-func NewPresetNotFoundError(name string) error {
-	return presetNotFoundError{
-		name:   name,
-		ErrStr: fmt.Sprintf("preset '%s' not found", name),
-	}
-}
+func NewPresetNotFoundError(name string) error { _ = "STUB: not implemented"; return nil }
 
 type presetNotFoundError struct {
 	name   string
@@ -24,17 +15,14 @@ type presetNotFoundError struct {
 }
 
 func (e presetNotFoundError) Error() string {
-	return e.ErrStr
+	_ = "STUB: not implemented"
+
+	// NewInvalidStartRequestError means that the request parameters of /start call
+	// were invalid.
+	return ""
 }
 
-// NewInvalidStartRequestError means that the request parameters of /start call
-// were invalid.
-func NewInvalidStartRequestError(err error) error {
-	return invalidStartRequestError{
-		err:    err,
-		ErrStr: fmt.Sprintf("invalid start request: %v", err),
-	}
-}
+func NewInvalidStartRequestError(err error) error { _ = "STUB: not implemented"; return nil }
 
 type invalidStartRequestError struct {
 	err    error
@@ -42,17 +30,16 @@ type invalidStartRequestError struct {
 }
 
 func (e invalidStartRequestError) Error() string {
-	return e.ErrStr
+	_ = "STUB: not implemented"
+
+	// NewStartFailedError means that the container failed to start for some
+	// reason.
+	return ""
 }
 
-// NewStartFailedError means that the container failed to start for some
-// reason.
 func NewStartFailedError(err error, c *gnomock.Container) error {
-	return startFailedError{
-		err:       err,
-		ErrStr:    fmt.Sprintf("start failed: %v", err),
-		Container: c,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type startFailedError struct {
@@ -62,17 +49,14 @@ type startFailedError struct {
 }
 
 func (e startFailedError) Error() string {
-	return e.ErrStr
+	_ = "STUB: not implemented"
+
+	// InvalidStopRequestError means that the request parameters of /stop call were
+	// invalid.
+	return ""
 }
 
-// InvalidStopRequestError means that the request parameters of /stop call were
-// invalid.
-func InvalidStopRequestError(err error) error {
-	return invalidStopRequestError{
-		err:    err,
-		ErrStr: fmt.Sprintf("invalid stop request: %v", err),
-	}
-}
+func InvalidStopRequestError(err error) error { _ = "STUB: not implemented"; return nil }
 
 type invalidStopRequestError struct {
 	err    error
@@ -80,17 +64,13 @@ type invalidStopRequestError struct {
 }
 
 func (e invalidStopRequestError) Error() string {
-	return e.ErrStr
+	_ = "STUB: not implemented"
+
+	// StopFailedError means that the container failed to stop.
+	return ""
 }
 
-// StopFailedError means that the container failed to stop.
-func StopFailedError(err error, c *gnomock.Container) error {
-	return stopFailedError{
-		err:       err,
-		ErrStr:    fmt.Sprintf("stop failed: %v", err),
-		Container: c,
-	}
-}
+func StopFailedError(err error, c *gnomock.Container) error { _ = "STUB: not implemented"; return nil }
 
 type stopFailedError struct {
 	err       error
@@ -99,17 +79,10 @@ type stopFailedError struct {
 }
 
 func (e stopFailedError) Error() string {
-	return e.ErrStr
+	_ = "STUB: not implemented"
+
+	// ErrorCode returns HTTP response code for the provided error.
+	return ""
 }
 
-// ErrorCode returns HTTP response code for the provided error.
-func ErrorCode(err error) int {
-	switch {
-	case errors.As(err, &invalidStartRequestError{}), errors.As(err, &invalidStopRequestError{}):
-		return http.StatusBadRequest
-	case errors.As(err, &presetNotFoundError{}):
-		return http.StatusNotFound
-	default:
-		return http.StatusInternalServerError
-	}
-}
+func ErrorCode(err error) int { _ = "STUB: not implemented"; return 0 }

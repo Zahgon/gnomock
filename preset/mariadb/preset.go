@@ -4,13 +4,8 @@ package mariadb
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"io"
-	"log"
-	"os"
 	"sync"
 
-	mysqldriver "github.com/go-sql-driver/mysql"
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -35,15 +30,7 @@ func init() {
 //
 // When used without any configuration, it creates a superuser `gnomock` with
 // password `gnoria`, and `mydb` database. Default MariaDB version is 10.5.8.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset implementation of MariaDB database.
 type P struct {
@@ -56,118 +43,25 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/library/mariadb:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.DefaultTCP(defaultPort)
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	setLoggerOnce.Do(func() {
-		// err is always nil for non-nil logger
-		_ = mysqldriver.SetLogger(log.New(io.Discard, "", -1))
-	})
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	p.setDefaults()
-
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck),
-		gnomock.WithEnv("MYSQL_USER=" + p.User),
-		gnomock.WithEnv("MYSQL_PASSWORD=" + p.Password),
-		gnomock.WithEnv("MYSQL_DATABASE=" + p.DB),
-		gnomock.WithEnv("MYSQL_RANDOM_ROOT_PASSWORD=yes"),
-		gnomock.WithInit(p.initf()),
-	}
-
-	return opts
-}
+// err is always nil for non-nil logger
 
 func (p *P) healthcheck(_ context.Context, c *gnomock.Container) error {
-	addr := c.Address(gnomock.DefaultPort)
-
-	db, err := p.connect(addr)
-	if err != nil {
-		if db != nil {
-			_ = db.Close()
-		}
-
-		return err
-	}
-
-	defer func() {
-		_ = db.Close()
-	}()
-
-	var one int
-
-	return db.QueryRow(`select 1`).Scan(&one)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *P) initf() gnomock.InitFunc {
-	return func(_ context.Context, c *gnomock.Container) error {
-		addr := c.Address(gnomock.DefaultPort)
+func (p *P) initf() gnomock.InitFunc { _ = "STUB: not implemented"; return *new(gnomock.InitFunc) }
 
-		db, err := p.connect(addr)
-		if err != nil {
-			return err
-		}
+// nolint:gosec
 
-		defer func() { _ = db.Close() }()
+func (p *P) connect(addr string) (*sql.DB, error) { _ = "STUB: not implemented"; return nil, nil }
 
-		if len(p.QueriesFiles) > 0 {
-			for _, f := range p.QueriesFiles {
-				bs, err := os.ReadFile(f) // nolint:gosec
-				if err != nil {
-					return fmt.Errorf("can't read queries file '%s': %w", f, err)
-				}
-
-				p.Queries = append([]string{string(bs)}, p.Queries...)
-			}
-		}
-
-		for _, q := range p.Queries {
-			_, err = db.Exec(q)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-}
-
-func (p *P) connect(addr string) (*sql.DB, error) {
-	connStr := fmt.Sprintf(
-		"%s:%s@tcp(%s)/%s?multiStatements=true",
-		p.User, p.Password, addr, p.DB,
-	)
-
-	db, err := sql.Open("mysql", connStr)
-	if err != nil {
-		return nil, err
-	}
-
-	return db, db.Ping()
-}
-
-func (p *P) setDefaults() {
-	if p.DB == "" {
-		p.DB = defaultDatabase
-	}
-
-	if p.User == "" {
-		p.User = defaultUser
-	}
-
-	if p.Password == "" {
-		p.Password = defaultPassword
-	}
-
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }

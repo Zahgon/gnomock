@@ -4,13 +4,6 @@
 package localstack
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"net/http"
-	"strconv"
-	"strings"
-
 	"github.com/orlangure/gnomock"
 	"github.com/orlangure/gnomock/internal/registry"
 )
@@ -34,15 +27,7 @@ func init() {
 // localstack container will be useless.
 //
 // This Preset cannot be used with localstack image prior to 0.11.0.
-func Preset(opts ...Option) gnomock.Preset {
-	p := &P{}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
-}
+func Preset(opts ...Option) gnomock.Preset { _ = "STUB: not implemented"; return *new(gnomock.Preset) }
 
 // P is a Gnomock Preset localstack implementation.
 type P struct {
@@ -52,166 +37,32 @@ type P struct {
 }
 
 // Image returns an image that should be pulled to create this container.
-func (p *P) Image() string {
-	return fmt.Sprintf("docker.io/localstack/localstack:%s", p.Version)
-}
+func (p *P) Image() string { _ = "STUB: not implemented"; return "" }
 
 // Ports returns ports that should be used to access this container.
-func (p *P) Ports() gnomock.NamedPorts {
-	return gnomock.NamedPorts{
-		webPort: {Protocol: "tcp", Port: 8080},
-		APIPort: {Protocol: "tcp", Port: 4566},
-	}
-}
+func (p *P) Ports() gnomock.NamedPorts { _ = "STUB: not implemented"; return *new(gnomock.NamedPorts) }
 
 // Options returns a list of options to configure this container.
-func (p *P) Options() []gnomock.Option {
-	p.setDefaults()
+func (p *P) Options() []gnomock.Option { _ = "STUB: not implemented"; return nil }
 
-	svcStrings := make([]string, len(p.Services))
-	for i, svc := range p.Services {
-		svcStrings[i] = string(svc)
-	}
-
-	svcEnv := strings.Join(svcStrings, ",")
-
-	opts := []gnomock.Option{
-		gnomock.WithHealthCheck(p.healthcheck(svcStrings)),
-		gnomock.WithEnv("SERVICES=" + svcEnv),
-		gnomock.WithInit(p.initf()),
-	}
-
-	return opts
-}
-
-func (p *P) setDefaults() {
-	if p.Version == "" {
-		p.Version = defaultVersion
-	}
-}
+func (p *P) setDefaults() { _ = "STUB: not implemented"; return }
 
 func (p *P) healthcheck(services []string) gnomock.HealthcheckFunc {
-	return func(ctx context.Context, c *gnomock.Container) (err error) {
-		addr := p.healthCheckAddress(c)
-
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, addr, nil)
-		if err != nil {
-			return err
-		}
-
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			closeErr := res.Body.Close()
-			if err == nil && closeErr != nil {
-				err = closeErr
-			}
-		}()
-
-		var hr healthResponse
-
-		decoder := json.NewDecoder(res.Body)
-
-		err = decoder.Decode(&hr)
-		if err != nil {
-			return err
-		}
-
-		if len(hr.Services) < len(services) {
-			return fmt.Errorf(
-				"not enough active services: want %d got %d [%s]",
-				len(services), len(hr.Services), hr.Services,
-			)
-		}
-
-		for _, service := range services {
-			status := hr.Services[service]
-			// available status was added in 0.13.0: it allows to lazy load the
-			// services after the first request
-			if status != "running" && status != "available" {
-				return fmt.Errorf("service '%s' is not running", service)
-			}
-		}
-
-		return nil
-	}
+	_ = "STUB: not implemented"
+	return *new(gnomock.HealthcheckFunc)
 }
+
+// available status was added in 0.13.0: it allows to lazy load the
+// services after the first request
 
 // healthCheckAddress returns the address of `/health` endpoint of a running
 // localstack container. Before version 0.11.3, the endpoint was available at
 // port 8080. In 0.11.3, the endpoint was moved to the default port (4566). In
 // 1.3.0, the endpoint was moved under `_localstack` prefix.
-func (p *P) healthCheckAddress(c *gnomock.Container) string {
-	defaultPath := fmt.Sprintf("http://%s/_localstack/health", c.Address(APIPort))
-	legacyPath := fmt.Sprintf("http://%s/health", c.Address(webPort))
-	notSoLegacyPath := fmt.Sprintf("http://%s/health", c.Address(APIPort))
-
-	if p.Version == defaultVersion {
-		return defaultPath
-	}
-
-	versionParts := strings.Split(p.Version, ".")
-	if len(versionParts) != 3 {
-		return defaultPath
-	}
-
-	major, err := strconv.Atoi(versionParts[0])
-	if err != nil {
-		return defaultPath
-	}
-
-	minor, err := strconv.Atoi(versionParts[1])
-	if err != nil {
-		return defaultPath
-	}
-
-	patch, err := strconv.Atoi(versionParts[2])
-	if err != nil {
-		return defaultPath
-	}
-
-	switch major {
-	case 0:
-		if minor == 11 && patch >= 3 {
-			return notSoLegacyPath
-		}
-
-		if minor >= 12 {
-			return notSoLegacyPath
-		}
-
-		return legacyPath
-
-	case 1:
-		if minor >= 3 {
-			return defaultPath
-		}
-
-		return notSoLegacyPath
-
-	default:
-		return defaultPath
-	}
-}
+func (p *P) healthCheckAddress(c *gnomock.Container) string { _ = "STUB: not implemented"; return "" }
 
 type healthResponse struct {
 	Services map[string]string `json:"services"`
 }
 
-func (p *P) initf() gnomock.InitFunc {
-	return func(_ context.Context, c *gnomock.Container) error {
-		for _, s := range p.Services {
-			if s == S3 {
-				err := p.initS3(c)
-				if err != nil {
-					return fmt.Errorf("can't init s3 storage: %w", err)
-				}
-			}
-		}
-
-		return nil
-	}
-}
+func (p *P) initf() gnomock.InitFunc { _ = "STUB: not implemented"; return *new(gnomock.InitFunc) }
